@@ -98,8 +98,8 @@ export function renderHome() {
     // The brief's "50 states + DC" cell was DROPPED: that figure appears
     // nowhere on the site, so it would have been a new number.
     + '<section class="numbers-strip"><div class="numbers-row">'
-    + '<div><div class="num-value">3,533,038</div><div class="num-label">Sq mi land area</div></div>'
-    + '<div><div class="num-value">93.8</div><div class="num-label">People per sq mi</div></div>'
+    + '<div><div class="num-value">3,533,038</div><div class="num-label">Sq mi land area · 2020</div></div>'
+    + '<div><div class="num-value">93.8</div><div class="num-label">People per sq mi · 2020</div></div>'
     + '<div><div class="num-value">331,449,281</div><div class="num-label">People counted in the 2020 census</div></div>'
     + '</div></section>'
     + '<div class="duo">'
@@ -154,7 +154,6 @@ export function renderPopulation(state) {
     + '<button data-poptab="age" class="' + (tab === 'age' ? 'on' : '') + '">Age structure</button>'
     + '<button data-poptab="growth" class="' + (tab === 'growth' ? 'on' : '') + '">Growth &amp; migration</button>'
     + '</div>'
-    + '<figure class="photo-strip"><img src="img/population.jpg" alt="Daytime view of Times Square in New York City, with billboards and a bustling crowd." loading="lazy"></figure>'
     + '<div class="people-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>'
     + '<div class="ground ground-teal">' + body + '</div>'
     + '<div class="panel"><h2>People at a glance</h2><dl class="facts">'
@@ -229,7 +228,6 @@ export function renderEconomy(state) {
     + '<button data-ecotab="housing" class="' + (tab === 'housing' ? 'on' : '') + '">Housing</button>'
     + '<button data-ecotab="business" class="' + (tab === 'business' ? 'on' : '') + '">Business &amp; education</button>'
     + '</div>'
-    + '<figure class="photo-strip"><img src="img/economy.jpg" alt="The New York Stock Exchange facade with columns in New York City." loading="lazy"></figure>'
     + '<div class="ground ground-slate">' + body + '</div>';
 }
 
@@ -302,7 +300,6 @@ export function renderCompare() {
 export function renderSources(rows) {
   return '<section class="band band-sources"><h1>Sources</h1><p class="band-sub">Every figure · its value · its vintage</p></section>'
     + '<p class="lede">Every figure on this site, with its value, vintage and where it came from. Full web addresses are given as plain text so the page works with no network at all.</p>'
-    + '<figure class="photo-strip"><img src="img/sources.jpg" alt="Stacks of old documents and papers piled on dusty shelves." loading="lazy"></figure>'
     + '<div class="panel"><table class="full src-table"><thead><tr><th>Code</th><th>Figure</th><th>Value</th><th>Vintage</th><th>Source</th><th>Location</th></tr></thead><tbody>'
     + rows.map(function (r) {
         return '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td><strong>' + r[2] + '</strong></td><td>' + r[3] + '</td><td>' + r[4] + '</td><td><code>' + r[5] + '</code></td></tr>';

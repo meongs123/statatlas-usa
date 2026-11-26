@@ -106,7 +106,7 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 22px 30px; }
   font-size: 12px; color: var(--muted); margin-top: 8px;
   border-top: 1px solid var(--line); padding-top: 6px;
 }
-.duo { display: grid; grid-template-columns: 1.15fr 1fr; gap: 12px; margin-bottom: 8px; }
+.duo { display: grid; grid-template-columns: 1.15fr 1fr; gap: 12px; margin-bottom: 8px; align-items: start; }
 .panel {
   background: var(--card); border: 1px solid var(--line); border-radius: 3px;
   padding: 14px 16px; margin-bottom: 12px;
@@ -218,16 +218,15 @@ footer p { max-width: 1136px; margin: 0 auto 10px; }
 }
 .band-economy {
   background-image: linear-gradient(rgba(20, 22, 25, .30), rgba(20, 22, 25, .30)), linear-gradient(to top, rgba(20, 22, 25, .55) 0%, rgba(20, 22, 25, 0) 45%), url(img/economy.jpg);
-  background-position: center, center, center;
+  background-position: center, center, center 0%;
 }
 .band-states {
   background-image: linear-gradient(rgba(20, 22, 25, .30), rgba(20, 22, 25, .30)), linear-gradient(to top, rgba(20, 22, 25, .55) 0%, rgba(20, 22, 25, 0) 45%), url(img/states.jpg);
   background-position: center, center, center 68%;
 }
-.band-compare {
-  background-image: linear-gradient(rgba(20, 22, 25, .30), rgba(20, 22, 25, .30)), linear-gradient(to top, rgba(20, 22, 25, .55) 0%, rgba(20, 22, 25, 0) 45%), url(img/compare-us.jpg);
-  background-position: center, center, center;
-}
+/* Fix pass 3b (F1): Compare band is a plain --bg-deep band, no photo —
+   the Compare duo below it is that route's single photo moment. */
+.band-compare {}
 .band-sources {
   background-image: linear-gradient(rgba(20, 22, 25, .30), rgba(20, 22, 25, .30)), linear-gradient(to top, rgba(20, 22, 25, .55) 0%, rgba(20, 22, 25, 0) 45%), url(img/sources.jpg);
   background-position: center, center, center;
