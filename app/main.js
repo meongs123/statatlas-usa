@@ -23,6 +23,20 @@ const state = {
 
 function show(html, route) {
   view.innerHTML = html;
+  // Fix pass 2 — route class on the view, so the per-route accent rules
+  // (.route-home h2, .route-population .tabs button.on, …) take effect.
+  view.className = 'route-' + (route || 'home');
+  // Move 3 — panel eyebrow: the section name above each ruled panel header
+  // (visual only; fresh innerHTML each render, so no duplicates accumulate).
+  var section = { '': 'The United States in Numbers', population: 'Population', economy: 'Economy', states: 'States', compare: 'Compare', sources: 'Sources', about: 'About' }[route] || '';
+  if (section) {
+    view.querySelectorAll('.panel:not(.detail) h2').forEach(function (h2) {
+      var e = document.createElement('p');
+      e.className = 'eyebrow';
+      e.textContent = section;
+      h2.parentNode.insertBefore(e, h2);
+    });
+  }
   nav.querySelectorAll('a').forEach(function (a) {
     const r = a.getAttribute('href').replace('#/', '').split('?')[0];
     a.classList.toggle('on', r === route);
