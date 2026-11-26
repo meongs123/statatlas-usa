@@ -16,9 +16,9 @@ export function barChart(rows, opts) {
     const y = 8 + i * (o.barHeight + o.gap);
     const w = Math.max(2, (r.value / max) * plotW);
     const shown = r.display !== undefined ? r.display : r.value.toFixed(o.decimals) + o.unit;
-    out += '<text x="0" y="' + (y + o.barHeight * 0.68) + '" font-size="13" fill="#2b2b26">' + esc(r.label) + '</text>';
     out += '<rect x="' + labelW + '" y="' + y + '" width="' + plotW + '" height="' + o.barHeight + '" rx="4" fill="' + o.track + '"/>';
     out += '<rect x="' + labelW + '" y="' + y + '" width="' + w.toFixed(1) + '" height="' + o.barHeight + '" rx="4" fill="' + (r.color || o.color) + '"/>';
+    out += '<text x="0" y="' + (y + o.barHeight * 0.68) + '" font-size="13" fill="#2b2b26">' + esc(r.label) + '</text>';
     out += '<text x="' + (labelW + w + 8) + '" y="' + (y + o.barHeight * 0.68) + '" font-size="13" font-weight="700" fill="#14201f">' + esc(shown) + '</text>';
   });
   out += '</svg>';

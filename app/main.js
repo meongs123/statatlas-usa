@@ -21,21 +21,34 @@ const state = {
   selected: null,
 };
 
-function render(route) {
-  let html = '';
-  if (route === 'population') html = renderPopulation(state);
-  else if (route === 'economy') html = renderEconomy(state);
-  else if (route === 'states') html = renderStates(state);
-  else if (route === 'compare') html = renderCompare();
-  else if (route === 'sources') html = renderSources();
-  else if (route === 'about') html = renderAbout();
-  else html = renderHome();
+function show(html, route) {
   view.innerHTML = html;
   nav.querySelectorAll('a').forEach(function (a) {
     const r = a.getAttribute('href').replace('#/', '').split('?')[0];
     a.classList.toggle('on', r === route);
   });
   window.scrollTo(0, 0);
+}
+
+function render(route) {
+  // Sources data is lazy: the table lives in sources-data.js and is only
+  // fetched when this route opens, so it never weighs down the first load.
+  if (route === 'sources') {
+    import('./sources-data.js').then(function (m) {
+      show(renderSources(m.SOURCE_ROWS), route);
+    }).catch(function () {
+      show('<h1>Sources</h1><p class="lede">The source list could not be loaded. Please reload the page.</p>', route);
+    });
+    return;
+  }
+  let html = '';
+  if (route === 'population') html = renderPopulation(state);
+  else if (route === 'economy') html = renderEconomy(state);
+  else if (route === 'states') html = renderStates(state);
+  else if (route === 'compare') html = renderCompare();
+  else if (route === 'about') html = renderAbout();
+  else html = renderHome();
+  show(html, route);
 }
 
 function rerender() {
@@ -79,5 +92,9 @@ startRouter(function (parsed) {
     if (parsed.params.region) state.region = parsed.params.region;
     if (parsed.params.q !== undefined) state.q = parsed.params.q;
   }
+  // Tabs are deep-linkable too (e.g. #/population?tab=growth) so a link can
+  // open a page already on its second tab.
+  if (parsed.route === 'population' && parsed.params.tab) state.popTab = parsed.params.tab;
+  if (parsed.route === 'economy' && parsed.params.tab) state.ecoTab = parsed.params.tab;
   render(parsed.route);
 });
