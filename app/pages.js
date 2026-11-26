@@ -10,7 +10,7 @@ function srcLine(text) {
 // Move 3 — dek lines: one clause restating what the figure counts, using
 // only the label / vintage / source wording already on the card. No new facts.
 var DEKS = {
-  'Total population': 'People living in the United States, counted in the latest estimate.',
+  'Total population': 'People living in the United States, in the latest estimate.',
   'Gross domestic product': 'The value of everything produced in a year.',
   'GDP, total': 'The value of everything produced in a year.',
   'Median household income': 'The middle household income, before tax.',
@@ -29,7 +29,7 @@ var DEKS = {
   'Per capita income': 'Income per person.',
   'Median home value': 'The middle value of owner-occupied homes.',
   'Median gross rent': 'The middle monthly rent.',
-  'Housing units': 'Homes counted in the latest estimate.',
+  'Housing units': 'Homes in the latest estimate.',
   'Owner-occupied housing': 'Homes lived in by their owners.',
   'Households': 'Occupied homes.',
   'Persons per household': 'People per occupied home, on average.',
@@ -39,8 +39,13 @@ var DEKS = {
   'Retail sales per capita': 'Shop sales per person.'
 };
 
-function statCard(value, label, year, source) {
-  var eyebrow = label.toUpperCase() + ' \u00b7 ' + String(year).toUpperCase();
+// Fix pass 2b (M1): the eyebrow used to repeat the card label verbatim
+// (label + year), then the label appeared again as .card-label and the
+// year a third time in .card-meta. Now the eyebrow carries the SECTION
+// name + vintage (per brief Move 3: e.g. POPULATION · 2024 ESTIMATE),
+// so the label is stated exactly once, as .card-label.
+function statCard(value, label, year, source, section) {
+  var eyebrow = (section || label).toUpperCase() + ' \u00b7 ' + String(year).toUpperCase();
   var dek = DEKS[label] || '';
   return '<article class="card"><div class="card-eyebrow">' + eyebrow + '</div>'
     + '<div class="card-value">' + value + '</div>'
@@ -73,16 +78,16 @@ export function renderHome() {
   return '<section class="releases"><strong>Latest releases</strong> '
     + RELEASES.map(function (r, i) { return '<span><b>' + r.date + '</b> — ' + r.text + (i < RELEASES.length - 1 ? '&nbsp;·' : '') + '</span>'; }).join(' ')
     + '</section>'
-    + '<section class="band band-amber band-home"><p class="band-line"><span class="band-num">' + USA.population.display + '</span> people — one country, counted 1 Jul 2025</p></section>'
+    + '<section class="band band-amber band-home"><p class="band-line"><span class="band-num">' + USA.population.display + '</span> people — one country, estimated 1 Jul 2025</p></section>'
     + '<h1>The United States in Numbers</h1>'
     + '<p class="lede">One country, every number that matters. Population, economy, housing, education and the states — each figure labelled with its source and year.</p>'
     + '<div class="ground ground-amber"><div class="cards cards-lead">'
-    + statCard(USA.population.display, 'Total population', '1 Jul 2025', 'U.S. Census Bureau, Vintage 2025')
-    + statCard(USA.gdp.display, 'Gross domestic product', '2024', 'World Bank WDI')
-    + statCard(USA.medianIncome.display, 'Median household income', '2023', 'U.S. Census Bureau, CPS ASEC')
-    + statCard(USA.poverty.display, 'Poverty rate', '2023', 'U.S. Census Bureau, CPS')
-    + statCard(USA.lifeExpectancy.display, 'Life expectancy at birth', '2024', 'World Bank WDI')
-    + statCard(USA.unemployment.display, 'Unemployment, modeled ILO est.', '2024', 'World Bank WDI')
+    + statCard(USA.population.display, 'Total population', '1 Jul 2025', 'U.S. Census Bureau, Vintage 2025', 'Population')
+    + statCard(USA.gdp.display, 'Gross domestic product', '2024', 'World Bank WDI', 'Economy')
+    + statCard(USA.medianIncome.display, 'Median household income', '2023', 'U.S. Census Bureau, CPS ASEC', 'Economy')
+    + statCard(USA.poverty.display, 'Poverty rate', '2023', 'U.S. Census Bureau, CPS', 'Economy')
+    + statCard(USA.lifeExpectancy.display, 'Life expectancy at birth', '2024', 'World Bank WDI', 'Population')
+    + statCard(USA.unemployment.display, 'Unemployment, modeled ILO est.', '2024', 'World Bank WDI', 'Economy')
     + '</div></div>'
     + '<div class="duo">'
     + '<section class="panel"><h2>Age structure, 2024</h2>' + chart
@@ -104,10 +109,10 @@ export function renderPopulation(state) {
   let body = '';
   if (tab === 'age') {
     body = '<div class="cards">'
-      + statCard('17.32%', 'Age 0–14', '2024', 'World Bank WDI')
-      + statCard('64.75%', 'Age 15–64', '2024', 'World Bank WDI')
-      + statCard('17.93%', 'Age 65+', '2024', 'World Bank WDI')
-      + statCard('50.9%', 'Female share', '2020–2024', 'U.S. Census Bureau, QuickFacts')
+      + statCard('17.32%', 'Age 0–14', '2024', 'World Bank WDI', 'Population')
+      + statCard('64.75%', 'Age 15–64', '2024', 'World Bank WDI', 'Population')
+      + statCard('17.93%', 'Age 65+', '2024', 'World Bank WDI', 'Population')
+      + statCard('50.9%', 'Female share', '2020–2024', 'U.S. Census Bureau, QuickFacts', 'Population')
       + '</div>'
       + '<div class="panel"><h2>Age structure — share of population</h2>'
       + barChart(colored(USA.ageStructure), { width: 560, unit: '%' })
@@ -115,10 +120,10 @@ export function renderPopulation(state) {
       + '</div>';
   } else {
     body = '<div class="cards">'
-      + statCard('+1.8 million', 'Growth 2024 → 2025 (+0.5%)', 'Jul 2024–Jul 2025', 'U.S. Census Bureau, Vintage 2025')
-      + statCard('+3.2 million', 'Growth 2023 → 2024 (+1.0%)', 'Jul 2023–Jul 2024', 'U.S. Census Bureau, Vintage 2025')
-      + statCard('1.3 million', 'Net international migration', 'Jul 2024–Jun 2025', 'U.S. Census Bureau, Vintage 2025')
-      + statCard('−53.8%', 'Migration vs the year before (2.7M)', 'Jul 2024–Jun 2025', 'U.S. Census Bureau, Vintage 2025')
+      + statCard('+1.8 million', 'Growth 2024 → 2025 (+0.5%)', 'Jul 2024–Jul 2025', 'U.S. Census Bureau, Vintage 2025', 'Population')
+      + statCard('+3.2 million', 'Growth 2023 → 2024 (+1.0%)', 'Jul 2023–Jul 2024', 'U.S. Census Bureau, Vintage 2025', 'Population')
+      + statCard('1.3 million', 'Net international migration', 'Jul 2024–Jun 2025', 'U.S. Census Bureau, Vintage 2025', 'Population')
+      + statCard('−53.8%', 'Migration vs the year before (2.7M)', 'Jul 2024–Jun 2025', 'U.S. Census Bureau, Vintage 2025', 'Population')
       + '</div>'
       + '<div class="panel"><h2>Growth &amp; migration</h2>'
       + barChart(colored([
@@ -154,12 +159,12 @@ export function renderEconomy(state) {
   let body = '';
   if (tab === 'income') {
     body = '<div class="cards">'
-      + statCard(USA.gdp.display, 'GDP, total', '2024', 'World Bank WDI')
-      + statCard(USA.gdpPerCapita.display, 'GDP per capita', '2024', 'World Bank WDI')
-      + statCard(USA.medianIncome.display, 'Median household income', '2023', 'U.S. Census Bureau, CPS ASEC')
-      + statCard(USA.poverty.display, 'Poverty rate', '2023', 'U.S. Census Bureau, CPS')
-      + statCard(USA.perCapitaIncome.display, 'Per capita income', '2020–2024', 'U.S. Census Bureau, ACS 5-yr')
-      + statCard(USA.unemployment.display, 'Unemployment, modeled ILO est.', '2024', 'World Bank WDI')
+      + statCard(USA.gdp.display, 'GDP, total', '2024', 'World Bank WDI', 'Economy')
+      + statCard(USA.gdpPerCapita.display, 'GDP per capita', '2024', 'World Bank WDI', 'Economy')
+      + statCard(USA.medianIncome.display, 'Median household income', '2023', 'U.S. Census Bureau, CPS ASEC', 'Economy')
+      + statCard(USA.poverty.display, 'Poverty rate', '2023', 'U.S. Census Bureau, CPS', 'Economy')
+      + statCard(USA.perCapitaIncome.display, 'Per capita income', '2020–2024', 'U.S. Census Bureau, ACS 5-yr', 'Economy')
+      + statCard(USA.unemployment.display, 'Unemployment, modeled ILO est.', '2024', 'World Bank WDI', 'Economy')
       + '</div>'
       + '<p class="note">GDP per capita is $86,169.66 in purchasing-power terms too — the same figure, not a coincidence: the US dollar is the base currency for PPP comparisons, so for the United States nominal and PPP per-capita GDP coincide by construction.</p>'
       + '<div class="panel"><h2>Rates</h2>'
@@ -180,28 +185,27 @@ export function renderEconomy(state) {
       + '<p class="note">One income figure per view: the headline median is $80,610 (CPS ASEC, 2023). The ACS 5-year median ($80,734, 2020–2024) is listed only on the Sources page. Poverty is 11.1% (CPS 2023); the QuickFacts current value is 10.2%.</p></div>';
   } else if (tab === 'housing') {
     body = '<div class="cards">'
-      + statCard(USA.homeValue.display, 'Median home value', '2020–2024', 'U.S. Census Bureau, ACS 5-yr')
-      + statCard(USA.rent.display, 'Median gross rent', '2020–2024', 'U.S. Census Bureau, ACS 5-yr')
-      + statCard(USA.housingUnits.display, 'Housing units', '1 Jul 2025', 'U.S. Census Bureau, Vintage 2025')
-      + statCard(USA.ownerOccupied.display, 'Owner-occupied housing', '2020–2024', 'U.S. Census Bureau, ACS 5-yr')
-      + statCard(USA.households.display, 'Households', '2020–2024', 'U.S. Census Bureau, ACS 5-yr')
-      + statCard(USA.personsPerHousehold.display, 'Persons per household', '2020–2024', 'U.S. Census Bureau, ACS 5-yr')
+      + statCard(USA.homeValue.display, 'Median home value', '2020–2024', 'U.S. Census Bureau, ACS 5-yr', 'Economy')
+      + statCard(USA.rent.display, 'Median gross rent', '2020–2024', 'U.S. Census Bureau, ACS 5-yr', 'Economy')
+      + statCard(USA.housingUnits.display, 'Housing units', '1 Jul 2025', 'U.S. Census Bureau, Vintage 2025', 'Economy')
+      + statCard(USA.ownerOccupied.display, 'Owner-occupied housing', '2020–2024', 'U.S. Census Bureau, ACS 5-yr', 'Economy')
+      + statCard(USA.households.display, 'Households', '2020–2024', 'U.S. Census Bureau, ACS 5-yr', 'Economy')
+      + statCard(USA.personsPerHousehold.display, 'Persons per household', '2020–2024', 'U.S. Census Bureau, ACS 5-yr', 'Economy')
       + '</div>'
-      + '<div class="panel panel-photo"><div class="panel-main"><h2>Housing in context</h2><p>148,260,882 housing units serve 129,227,496 households — 2.53 people per household on average. '
+      + '<div class="panel"><h2>Housing in context</h2><p>148,260,882 housing units serve 129,227,496 households — 2.53 people per household on average. '
       + '65.2% of homes are owner-occupied; the median home is worth $332,700 and the median rent is $1,413 a month.</p>'
-      + srcLine('U.S. Census Bureau, QuickFacts (ACS 5-year 2020–2024; housing units Vintage 2025).') + '</div>'
-      + '<figure class="photo-side"><img src="img/economy.jpg" alt="The New York Stock Exchange facade with columns and American flags in New York City." loading="lazy"></figure></div>';
+      + srcLine('U.S. Census Bureau, QuickFacts (ACS 5-year 2020–2024; housing units Vintage 2025).') + '</div>';
   } else {
     body = '<div class="cards">'
-      + statCard(USA.establishments.display, 'Employer establishments', '2023', 'U.S. Census Bureau, QuickFacts')
-      + statCard(USA.businessEmployment.display, 'Employment at those firms', '2023', 'U.S. Census Bureau, QuickFacts')
-      + statCard(USA.payroll.display, 'Annual payroll', '2023', 'U.S. Census Bureau, QuickFacts')
-      + statCard(USA.retailPerCapita.display, 'Retail sales per capita', '2022', 'U.S. Census Bureau, QuickFacts')
+      + statCard(USA.establishments.display, 'Employer establishments', '2023', 'U.S. Census Bureau, QuickFacts', 'Economy')
+      + statCard(USA.businessEmployment.display, 'Employment at those firms', '2023', 'U.S. Census Bureau, QuickFacts', 'Economy')
+      + statCard(USA.payroll.display, 'Annual payroll', '2023', 'U.S. Census Bureau, QuickFacts', 'Economy')
+      + statCard(USA.retailPerCapita.display, 'Retail sales per capita', '2022', 'U.S. Census Bureau, QuickFacts', 'Economy')
       + '</div>'
       + '<div class="panel panel-photo"><div class="panel-main"><h2>Business &amp; education</h2><p>8,361,342 employer establishments employ 139,831,742 people and pay $9.556 trillion a year. '
       + 'Among residents age 25 and older, 89.6% finished high school and 35.7% hold a bachelor’s degree or higher (2020–2024).</p>'
       + srcLine('U.S. Census Bureau, QuickFacts.') + '</div>'
-      + '<figure class="photo-side"><img src="img/economy.jpg" alt="The New York Stock Exchange facade with columns and American flags in New York City." loading="lazy"></figure></div>';
+      + '<figure class="photo-side"><img src="img/economy.jpg" alt="The New York Stock Exchange facade with columns in New York City." loading="lazy"></figure></div>';
   }
   return '<section class="band band-pine"><h1>Economy</h1><p class="band-sub">$29.298 trillion · 2024</p></section>'
     + '<p class="lede">A $29.298 trillion economy in 2024 — $86,169.66 per person, the same in purchasing-power terms.</p>'

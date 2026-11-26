@@ -77,11 +77,14 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 22px 30px; }
 .card:nth-child(5) { border-top-color: var(--amber); }
 /* Move 3 — home lead card is the cover story: spans two columns. */
 .cards-lead .card:first-child { grid-column: span 2; }
-/* Move 1 — oversized numerals. */
+/* Move 1 — oversized numerals. Fix pass 2b (M2): 40px wrapped
+   "$29.298 TRILLION" to two lines in the narrow Home GDP card, so the
+   card stood taller than its siblings. 34px still reads as a display
+   numeral and fits the longest value on one line. */
 .card-value {
   font-family: var(--display); font-stretch: condensed; text-transform: uppercase;
   letter-spacing: .02em; line-height: 1.05; font-weight: 800;
-  font-size: 40px; color: var(--pine); font-variant-numeric: tabular-nums;
+  font-size: 34px; color: var(--pine); font-variant-numeric: tabular-nums;
 }
 /* Move 3 — eyebrow above the value, dek under the label, byline-date at the foot. */
 .card-eyebrow {
@@ -200,7 +203,7 @@ footer {
 }
 .band-states {
   background-image: linear-gradient(rgba(14, 59, 52, .60), rgba(14, 59, 52, .60)), url(img/states.jpg);
-  background-size: cover; background-position: center 40%;
+  background-size: cover; background-position: center 68%;
 }
 .band-about {
   background-image: linear-gradient(rgba(14, 59, 52, .60), rgba(14, 59, 52, .60)), url(img/about.jpg);
@@ -220,10 +223,15 @@ footer {
 .ground-pine { background-color: var(--tint-pine); background-image: url(img/pattern-dots.svg); }
 
 /* Photo strips (Population, Sources): full-bleed, no text on the photo,
-   tinted ground shows through if the file ever fails to load. */
+   tinted ground shows through if the file ever fails to load.
+   Fix pass 2b (H1): the 21:9 strip rendered ~506px tall and pushed every
+   stat below the fold (ads first screen). Capped at 260px with
+   object-position: bottom so the crowd — the photo's subject — stays
+   in frame instead of being centre-cropped away. */
 .photo-strip { margin: 0 -22px 14px; }
 .photo-strip img {
   display: block; width: 100%; aspect-ratio: 21 / 9; object-fit: cover;
+  max-height: 260px; object-position: center bottom;
   outline: 1px solid rgba(0, 0, 0, .1); outline-offset: -1px; background: var(--tint-teal);
 }
 .route-sources .photo-strip img { background: var(--tint-slate); }
@@ -296,3 +304,16 @@ footer {
 
 /* Document-stack mark beside the Sources "Method notes" heading. */
 .panel h2 svg { vertical-align: -2px; margin-right: 6px; }
+
+/* Fix pass 2b (QA#3) — phone 8px horizontal scroll. Root cause: the
+   ≤860px override above (`.ground, .photo-strip, .photo-duo { margin:
+   -14px }`) is dead — the fix-pass-2 rules (margin: 0 -22px) come later
+   in this file and override it, so at 390px those elements were 406px
+   wide in a 390px viewport (documentElement.scrollWidth 398). This
+   block sits after those rules, so the -14px margins finally apply and
+   full-bleed elements are exactly viewport-wide. overflow-x: clip on
+   body is a guard for the same breakpoint. */
+@media (max-width: 860px) {
+  body { overflow-x: clip; }
+  .ground, .photo-strip, .photo-duo { margin-left: -14px; margin-right: -14px; }
+}
